@@ -2,14 +2,14 @@
 
 -- Base de datos para 'granja_avicola' en PostgreSQL
 
--- Tabla: metodos_pago
+-- Tabla: metodos_pago -ad
 CREATE TABLE metodos_pago (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50),
     observaciones TEXT
 );
 
--- Tabla: inventario
+-- Tabla: inventario...
 CREATE TABLE inventario (
     id SERIAL PRIMARY KEY,
     nombre_producto VARCHAR(100) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE inventario (
 
 
 
--- Tabla: incubadoras
+-- Tabla: incubadoras...
 CREATE TABLE incubadoras (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100),
@@ -40,7 +40,7 @@ CREATE TABLE incubadoras (
     observaciones TEXT
 );
 
--- Tabla: lotes_huevos
+-- Tabla: lotes_huevos...
 CREATE TABLE lotes_huevos (
     id SERIAL PRIMARY KEY,
     incubadora_id INT REFERENCES incubadoras(id),
@@ -50,7 +50,7 @@ CREATE TABLE lotes_huevos (
     observaciones TEXT
 );
 
--- Tabla: pollitos
+-- Tabla: pollitos...
 CREATE TABLE pollitos (
     id SERIAL PRIMARY KEY,
     lote_id INT REFERENCES lotes_huevos(id),
@@ -61,7 +61,7 @@ CREATE TABLE pollitos (
     observaciones TEXT
 );
 
--- Tabla: pollos_produccion
+-- Tabla: pollos_produccion...
 CREATE TABLE pollos_produccion (
     id SERIAL PRIMARY KEY,
     pollito_id INT REFERENCES pollitos(id),

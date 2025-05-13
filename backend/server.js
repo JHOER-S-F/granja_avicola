@@ -3,6 +3,9 @@ const cors = require('cors');
 const path = require('path');
 const client = require('./config/db');
 const authRoutes = require('./routers/authRoutes');
+const empleado = require('./routers/empleadoRoutes')
+const admin = require('./routers/adminRoutes');
+const { console } = require('inspector');
 
 
 const app = express();
@@ -15,17 +18,13 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-
-app.get('/', (req, res) => {
-    res.send('Servidor backend funcionando');
-});
-
-// ✅ Rutas de autenticación correctamente usadas
+// Ruta de autenticación 
 app.use('/api/auth', authRoutes);
+//Ruta de empleado
+app.use('/api/empl', empleado);
+//ruta de admin
+app.use('/api/admi', admin);
 
-app.get('/api/hola', (req, res) => {
-    res.json({ mensaje: '¡Hola desde el backend!' });
-});
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve(__dirname, '../frontend/dist')));
@@ -36,10 +35,10 @@ if (process.env.NODE_ENV === 'production') {
 
 client.connect()
   .then(() => {
-    console.log('🟢 Conectado a PostgreSQL');
+    console.log('Conectado a PostgreSQL');
   })
   .catch(err => {
-    console.error('🔴 Error de conexión a PostgreSQL:', err.message);
+    console.error('Error de conexión a PostgreSQL:', err.message);
   });
 
 app.listen(PORT, () => {
