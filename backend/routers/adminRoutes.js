@@ -9,7 +9,6 @@ router.get('/inc/:id', incubadorasController.obtenerIncubadoraPorId);
 router.put('/inc/:id', incubadorasController.actualizarIncubadora);
 router.delete('/inc/:id', incubadorasController.eliminarIncubadora);
 
-
 const inventarioController = require('../controllers/admin/inventarioController');
 router.post('/inv', inventarioController.crearInventario);
 router.get('/inv', inventarioController.obtenerInventario);
@@ -95,7 +94,6 @@ router.put('/com/:id', comprasController.updateCompra);
 router.delete('/com/:id', comprasController.deleteCompra);
 
 const usuariosController = require('../controllers/admin/usuariosController');
-
 router.get('/usu', usuariosController.getAllUsuarios);
 router.get('/usu/:id', usuariosController.getUsuarioById);
 router.post('/usu', usuariosController.createUsuario);
