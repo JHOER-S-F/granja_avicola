@@ -1,6 +1,6 @@
 const pool = require('../../config/db');
 
-// Obtener todos los lotes con nombre e ID de la incubadora
+//Obtener todos los lotes con nombre e ID de la incubadora
 exports.obtenerLotes = async (req, res) => {
   try {
     const result = await pool.query(`

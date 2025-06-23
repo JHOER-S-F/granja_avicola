@@ -1,0 +1,8 @@
+Color	Hex	Uso sugerido
+🌿 Verde Limón	#B9FBC0	Fondo suave, tarjetas
+🍋 Amarillo Mostaza	#FDE74C	Botones, íconos llamativos
+🧡 Naranja Coral	#FF9B71	Hover, botones secundarios
+🐣 Amarillo Pollo	#FFDE59	Encabezados, highlights
+🩵 Azul Cielo Claro	#A0E7E5	Fondos de secciones
+🦚 Verde Esmeralda	#3EC300	Elementos interactivos, CTA
+🧁 Rosado Pastel	#FFB5E8	Detalles decorativos

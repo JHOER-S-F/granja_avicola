@@ -1,12 +1,32 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// Importa tus vistas
+// VISTAS PRINSIPALES
+import HomeView from '../views/HomeView.vue'
 import Login from '../components/Login.vue';
 import Register from '../components/Register.vue';
 import Logout from '../components/Logout.vue';
-import HomeView from '../views/HomeView.vue'
 
-
+//VISTA ADMIN
+import ali from '../views/admin/AlimentacionPollos.vue'
+import met from '../views/admin/MetodosPago.vue'
+import inv from '../views/admin/InventarioComponent.vue'
+import usu from '../views/admin/Usuarios.vue'
+import baj from '../views/admin/BajasPollos.vue'
+import inc from '../views/admin/IncubadorasComponent.vue'
+import lot from '../views/admin/LotesHuevosComponent.vue'
+import pol from '../views/admin/pollitosComponent.vue'
+import vac from '../views/admin/VacunasComponent.vue'
+import pro from '../views/admin/PollosProduccionComponent.vue'
+import ven from '../views/admin/VentasPollitosComponent.vue'
+import vep from '../views/admin/VentasPollosComponent.vue'
+import tra from '../views/admin/TrabajadoresComponent.vue'
+import pag from '../views/admin/PagosTrabajadoresComponent.vue'
+import gas from '../views/admin/GastosGeneralesComponent.vue'
+import com from '../views/admin/InversionComprasComponent.vue'
+import con from '../views/admin/ContabilidadGeneralComponent.vue'
+import eve from '../views/admin/EventosGeneralesComponent.vue'
+//VISTA EMPLEADO
+import alimentacion from '../views/empleado/AlimentacionPollos.vue'
 const routes = [
   {
     path: '/',
@@ -17,8 +37,28 @@ const routes = [
   { path: '/login', component: Login },
   { path: '/register', component: Register },
   { path: '/logout', component: Logout },
+  //VISTA ADMIN
+  { path: '/admin/ali', component:ali},
+  { path: '/admin/met', component:met},
+  { path: '/admin/inv', component:inv},
+  { path: '/admin/usu', component:usu},
+  { path: '/admin/baj', component:baj},
+  { path: '/admin/inc', component:inc},
+  { path: '/admin/lot', component:lot},
+  { path: '/admin/pol', component:pol},
+  { path: '/admin/vac', component:vac},
+  { path: '/admin/pro', component:pro},
+  { path: '/admin/ven', component:ven},
+  { path: '/admin/vep', component:vep},
+  { path: '/admin/tra', component:tra},
+  { path: '/admin/pag', component:pag},
+  { path: '/admin/gas', component:gas},
+  { path: '/admin/com', component:com},
+  { path: '/admin/con', component:con},
+  { path: '/admin/eve', component:eve},
+  //VISTA EMPLEADO
+  { path: '/empleado/alimentacion', component: alimentacion},
 
-  
 ]
 
 const router = createRouter({

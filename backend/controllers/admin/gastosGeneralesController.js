@@ -1,6 +1,6 @@
 const db = require('../../config/db');
 
-// Obtener todos los gastos
+//Obtener todos los gastos
 exports.getAllGastos = async (req, res) => {
   try {
     const result = await db.query('SELECT * FROM gastos_generales');

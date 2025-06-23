@@ -15,6 +15,8 @@ router.get('/inv', inventarioController.obtenerInventario);
 router.get('/inv:id', inventarioController.obtenerInventarioPorId);
 router.put('/inv/:id', inventarioController.actualizarInventario);
 router.delete('/inv/:id', inventarioController.eliminarInventario);
+router.get('/inv/filtrar', inventarioController.filtrarInventario);
+router.get('/inv/estadisticas', inventarioController.estadisticasPorCategoria);
 
 const lotesController = require('../controllers/admin/lotesHuevosController');
 router.post('/lot', lotesController.crearLote);
@@ -51,12 +53,21 @@ router.post('/vac', vacunas.createVacuna);
 router.put('/vac/:id', vacunas.updateVacuna);
 router.delete('/vac/:id', vacunas.deleteVacuna);
 
+
+
 const ventas = require('../controllers/admin/ventasPollitosController');
 router.get('/ven', ventas.getAllVentas);
 router.get('/ven/:id', ventas.getVentaById);
 router.post('/ven', ventas.createVenta);
 router.put('/ven/:id', ventas.updateVenta);
 router.delete('/ven/:id', ventas.deleteVenta);
+
+const ventasPollos = require('../controllers/admin/ventasPollosController');
+router.get('/vep', ventasPollos.obtenerTodas);
+router.get('/vep/:id', ventasPollos.obtenerPorId);
+router.post('/vep', ventasPollos.crear);
+router.put('/vep/:id', ventasPollos.actualizar);
+router.delete('/vep/:id', ventasPollos.eliminar);
 
 const alimentacion = require('../controllers/admin/alimentacionPollosController');
 router.get('/ali', alimentacion.getAllAlimentaciones);
@@ -115,6 +126,14 @@ router.get('/eve', eventosController.obtenerTodos);
 router.get('/eve/:id', eventosController.obtenerPorId);
 router.put('/eve/:id', eventosController.actualizar);
 router.delete('/eve:id', eventosController.eliminar);
+
+const bajasPollosController = require('../controllers/admin/bajasPollosController');
+
+router.get('/baj', bajasPollosController.obtenerBajasPollos);
+router.get('/baj/:id', bajasPollosController.obtenerBajaPorId);
+router.post('/baj/', bajasPollosController.crearBajaPollo);
+router.put('/baj/:id', bajasPollosController.actualizarBajaPollo);
+router.delete('/baj/:id', bajasPollosController.eliminarBajaPollo);
 
 
 

@@ -1,6 +1,6 @@
 const db = require('../../config/db');
 
-// Obtener todos los pagos con nombre del trabajador, cargo y método de pago
+//Obtener todos los pagos con nombre del trabajador, cargo y método de pago
 exports.getAllPagos = async (req, res) => {
   try {
     const result = await db.query(`

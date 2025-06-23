@@ -1,6 +1,6 @@
 const db = require('../../config/db');
 
-// Obtener todos los registros de alimentación
+// Obtener todos los registros de alimentación...
 exports.getAllAlimentaciones = async (req, res) => {
   try {
     const result = await db.query(`

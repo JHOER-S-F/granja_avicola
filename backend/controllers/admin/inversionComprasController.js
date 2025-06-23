@@ -1,6 +1,6 @@
 const db = require('../../config/db');
 
-// Obtener todas las compras esenciales con nombre del método de pago
+//Obtener todas las compras esenciales con nombre del método de pago
 exports.getAllCompras = async (req, res) => {
   try {
     const result = await db.query(`

@@ -1,6 +1,6 @@
 const db = require('../../config/db');
 
-// Obtener todas las ventas de pollitos con info de métodos de pago y pollitos
+//Obtener todas las ventas de pollitos con info de métodos de pago y pollitos
 exports.getAllVentas = async (req, res) => {
   try {
     const result = await db.query(`

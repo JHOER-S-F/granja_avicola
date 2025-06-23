@@ -1,6 +1,6 @@
 const db = require('../../config/db');
 
-// Obtener todos los registros de alimentación
+// Obtener todos los registros de alimentación con multiplicación de cantidad
 exports.getAllAlimentaciones = async (req, res) => {
   try {
     const result = await db.query(`
@@ -14,8 +14,10 @@ exports.getAllAlimentaciones = async (req, res) => {
         a.etapa_produccion,
         a.observaciones,
         p.id AS pollo_id,
+        p.nombre,
         p.fecha_ingreso,
-        p.estado
+        p.cantidad,
+        (a.cantidad_kg * p.cantidad) AS total_kg_consumidos
       FROM alimentacion_pollos a
       LEFT JOIN pollos_produccion p ON a.pollo_id = p.id
     `);
@@ -25,7 +27,7 @@ exports.getAllAlimentaciones = async (req, res) => {
   }
 };
 
-// Obtener una alimentación por ID
+// Obtener un registro de alimentación por ID
 exports.getAlimentacionById = async (req, res) => {
   const id = req.params.id;
   try {
@@ -40,8 +42,10 @@ exports.getAlimentacionById = async (req, res) => {
         a.etapa_produccion,
         a.observaciones,
         p.id AS pollo_id,
+        p.nombre,
         p.fecha_ingreso,
-        p.estado
+        p.cantidad,
+        (a.cantidad_kg * p.cantidad) AS total_kg_consumidos
       FROM alimentacion_pollos a
       LEFT JOIN pollos_produccion p ON a.pollo_id = p.id
       WHERE a.id = $1
@@ -76,8 +80,15 @@ exports.updateAlimentacion = async (req, res) => {
   try {
     const result = await db.query(`
       UPDATE alimentacion_pollos
-      SET pollo_id = $1, fecha = $2, tipo_alimento = $3, cantidad_kg = $4,
-          proveedor = $5, hora_aplicacion = $6, etapa_produccion = $7, observaciones = $8
+      SET 
+        pollo_id = $1, 
+        fecha = $2, 
+        tipo_alimento = $3, 
+        cantidad_kg = $4,
+        proveedor = $5, 
+        hora_aplicacion = $6, 
+        etapa_produccion = $7, 
+        observaciones = $8
       WHERE id = $9
       RETURNING *
     `, [pollo_id, fecha, tipo_alimento, cantidad_kg, proveedor, hora_aplicacion, etapa_produccion, observaciones, id]);

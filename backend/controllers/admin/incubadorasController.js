@@ -1,4 +1,4 @@
-const pool = require('../../config/db'); 
+const pool = require ('../../config/db'); 
 
 exports.crearIncubadora = async (req, res) => {
   const { nombre, capacidad, ubicacion, estado, observaciones } = req.body;

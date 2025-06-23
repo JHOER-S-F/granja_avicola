@@ -1,6 +1,6 @@
 const db = require('../../config/db');
 
-// Obtener todos los registros
+//Obtener todos los registros
 exports.obtenerTodos = async (req, res) => {
   try {
     const result = await db.query('SELECT * FROM contabilidad_general ORDER BY fecha DESC');

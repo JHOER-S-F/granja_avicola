@@ -1,35 +1,69 @@
-@import './base.css';
+/* ========== 🌈 Variables Globales ========== */
+:root {
+  /* 🎨 Paleta de Colores */
+  --color-bg-limon:   #B9FBC0;  /* Fondo suave, tarjetas */
+  --color-amarillo:   #FDE74C;  /* Botones llamativos */
+  --color-coral:      #FF9B71;  /* Hover, botones secundarios */
+  --color-pollo:      #FFDE59;  /* Títulos y destacados */
+  --color-cielo:      #A0E7E5;  /* Secciones suaves */
+  --color-esmeralda:  #3EC300;  /* CTA y elementos interactivos */
+  --color-rosado:     #FFB5E8;  /* Etiquetas decorativas */
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+  /* 🔤 Tipografía */
+  --font-main:        'Poppins', sans-serif;
+  --text-color:       #333;
+  --font-size-base:   16px;
+
+  /* 🧩 Misceláneos */
+  --transition-fast:  0.3s;
+  --radius-lg:        12px;
+  --radius-sm:        6px;
 }
 
-a,
-.green {
+/* ========== 🔘 Botones ========== */
+.btn-primary {
+  background-color: var(--color-esmeralda);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-coral);
+}
+
+/* ========== 📝 Tipografía ========== */
+.title-highlight {
+  color: var(--color-pollo);
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* ========== 🏷️ Etiquetas Decorativas ========== */
+.label-fancy {
+  background-color: var(--color-rosado);
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+/* ========== 🔗 Enlaces ========== */
+a {
+  color: var(--color-esmeralda);
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
+  transition: background-color var(--transition-fast);
   padding: 3px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+a:hover {
+  background-color: rgba(62, 195, 0, 0.2); /* Fondo esmeralda claro */
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+/* ========== 🎨 Clase Secundaria ========== */
+.green {
+  color: hsla(160, 100%, 37%, 1);
 }
+

@@ -1,6 +1,6 @@
 const pool = require('../../config/db');
 
-// Crear método de pago
+// Crear método de pago´´
 exports.crearMetodo = async (req, res) => {
     const { nombre, observaciones } = req.body;
     try {

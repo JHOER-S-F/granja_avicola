@@ -13,11 +13,11 @@ exports.getAllVacunas = async (req, res) => {
         p.id AS pollito_id,
         p.cantidad_vivos,
         pr.id AS pollo_id,
-        pr.estado,
         pr.fecha_ingreso
       FROM vacunas v
       LEFT JOIN pollitos p ON v.pollito_id = p.id
       LEFT JOIN pollos_produccion pr ON v.pollo_id = pr.id
+      ORDER BY v.fecha_aplicacion DESC
     `);
     res.json(result.rows);
   } catch (error) {
@@ -39,7 +39,6 @@ exports.getVacunaById = async (req, res) => {
         p.id AS pollito_id,
         p.cantidad_vivos,
         pr.id AS pollo_id,
-        pr.estado,
         pr.fecha_ingreso
       FROM vacunas v
       LEFT JOIN pollitos p ON v.pollito_id = p.id
@@ -55,13 +54,22 @@ exports.getVacunaById = async (req, res) => {
 
 // Crear nueva vacuna
 exports.createVacuna = async (req, res) => {
-  const { pollito_id, pollo_id, fecha_aplicacion, nombre_vacuna, cantidad_dosis, observaciones } = req.body;
+  let { pollito_id, pollo_id, fecha_aplicacion, nombre_vacuna, cantidad_dosis, observaciones } = req.body;
+
+  pollito_id = pollito_id || null;
+  pollo_id = pollo_id || null;
+
+  if ((!pollito_id && !pollo_id) || (pollito_id && pollo_id)) {
+    return res.status(400).json({ error: "Debe seleccionar solo un pollito o un pollo, no ambos." });
+  }
+
   try {
     const result = await db.query(`
       INSERT INTO vacunas (pollito_id, pollo_id, fecha_aplicacion, nombre_vacuna, cantidad_dosis, observaciones)
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `, [pollito_id, pollo_id, fecha_aplicacion, nombre_vacuna, cantidad_dosis, observaciones]);
+
     res.status(201).json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -71,16 +79,30 @@ exports.createVacuna = async (req, res) => {
 // Actualizar vacuna
 exports.updateVacuna = async (req, res) => {
   const id = req.params.id;
-  const { pollito_id, pollo_id, fecha_aplicacion, nombre_vacuna, cantidad_dosis, observaciones } = req.body;
+  let { pollito_id, pollo_id, fecha_aplicacion, nombre_vacuna, cantidad_dosis, observaciones } = req.body;
+
+  pollito_id = pollito_id || null;
+  pollo_id = pollo_id || null;
+
+  if ((!pollito_id && !pollo_id) || (pollito_id && pollo_id)) {
+    return res.status(400).json({ error: "Debe seleccionar solo un pollito o un pollo, no ambos." });
+  }
+
   try {
     const result = await db.query(`
       UPDATE vacunas
-      SET pollito_id = $1, pollo_id = $2, fecha_aplicacion = $3,
-          nombre_vacuna = $4, cantidad_dosis = $5, observaciones = $6
+      SET pollito_id = $1,
+          pollo_id = $2,
+          fecha_aplicacion = $3,
+          nombre_vacuna = $4,
+          cantidad_dosis = $5,
+          observaciones = $6
       WHERE id = $7
       RETURNING *
     `, [pollito_id, pollo_id, fecha_aplicacion, nombre_vacuna, cantidad_dosis, observaciones, id]);
+
     if (result.rows.length === 0) return res.status(404).json({ error: "Vacuna no encontrada" });
+
     res.json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });

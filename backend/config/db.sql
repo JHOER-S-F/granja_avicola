@@ -65,16 +65,26 @@ CREATE TABLE pollitos (
 CREATE TABLE pollos_produccion (
     id SERIAL PRIMARY KEY,
     pollito_id INT REFERENCES pollitos(id),
-    fecha_ingreso DATE,
+    nombre VARCHAR(40),
+    fecha_ingreso DATE NOT NULL,
+    cantidad INT CHECK (cantidad > 0) NOT NULL,
     peso_inicial NUMERIC(5,2),
-    estado VARCHAR(20) CHECK (estado IN ('vivo', 'muerto', 'vendido')) DEFAULT 'vivo',
-    causa_muerte TEXT,
-    fecha_muerte DATE,
     fecha_actualizacion DATE DEFAULT CURRENT_DATE,
     observaciones TEXT
 );
+ 
+ 
+ CREATE TABLE bajas_pollos (
+    id SERIAL PRIMARY KEY,
+    pollo_id INT REFERENCES pollos_produccion(id),
+    lote_id INT,
+    causa VARCHAR(20) NOT NULL CHECK (causa IN ('muerte', 'venta')),
+    cantidad INT CHECK (cantidad > 0) NOT NULL,
+    fecha DATE DEFAULT CURRENT_DATE,
+    observaciones TEXT
+);
 
--- Tabla: vacunas
+-- Tabla: vacunas...
 CREATE TABLE vacunas (
     id SERIAL PRIMARY KEY,
     pollito_id INT REFERENCES pollitos(id),
@@ -85,7 +95,7 @@ CREATE TABLE vacunas (
     observaciones TEXT
 );
 
--- Tabla: ventas_pollitos
+-- Tabla: ventas_pollitos...
 CREATE TABLE ventas_pollitos (
     id SERIAL PRIMARY KEY,
     pollito_id INT REFERENCES pollitos(id),
@@ -97,7 +107,7 @@ CREATE TABLE ventas_pollitos (
     observaciones TEXT
 );
 
--- Tabla: alimentacion_pollos
+-- Tabla: alimentacion_pollos...
 CREATE TABLE alimentacion_pollos (
     id SERIAL PRIMARY KEY,
     pollo_id INT REFERENCES pollos_produccion(id),
@@ -110,7 +120,7 @@ CREATE TABLE alimentacion_pollos (
     observaciones TEXT
 );
 
--- Tabla: ventas_pollos
+-- Tabla: ventas_pollos...
 CREATE TABLE ventas_pollos (
     id SERIAL PRIMARY KEY,
     pollo_id INT REFERENCES pollos_produccion(id),
@@ -123,7 +133,7 @@ CREATE TABLE ventas_pollos (
     observaciones TEXT
 );
 
--- Tabla: trabajadores
+-- Tabla: trabajadores...
 CREATE TABLE trabajadores (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100),
@@ -135,7 +145,7 @@ CREATE TABLE trabajadores (
     observaciones TEXT
 );
 
--- Tabla: pagos_trabajadores
+-- Tabla: pagos_trabajadores...
 CREATE TABLE pagos_trabajadores (
     id SERIAL PRIMARY KEY,
     trabajador_id INT REFERENCES trabajadores(id),
@@ -145,7 +155,7 @@ CREATE TABLE pagos_trabajadores (
     observaciones TEXT
 );
 
--- Tabla: gastos_generales
+-- Tabla: gastos_generales...
 CREATE TABLE gastos_generales (
     id SERIAL PRIMARY KEY,
     fecha DATE,
@@ -155,7 +165,7 @@ CREATE TABLE gastos_generales (
     observaciones TEXT
 );
 
--- Tabla: compra_esencial
+-- Tabla: compra_esencial...
 CREATE TABLE inversion_compras (
     id SERIAL PRIMARY KEY,
     nombre_producto VARCHAR(100),
@@ -168,7 +178,7 @@ CREATE TABLE inversion_compras (
     observaciones TEXT
 );
 
--- Tabla: usuarios
+-- Tabla: usuarios...
 CREATE TABLE usuarios (
     id SERIAL PRIMARY KEY,
     nombre_usuario VARCHAR(50) UNIQUE,
@@ -193,8 +203,8 @@ CREATE TABLE contabilidad_general (
 CREATE TABLE eventos_generales (
     id SERIAL PRIMARY KEY,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    tabla_origen VARCHAR(50) NOT NULL, -- ejemplo: 'ventas_pollitos', 'alimentacion_pollos', etc.
-    registro_id INT NOT NULL,          -- ID del registro en la tabla correspondiente
+    tabla_origen VARCHAR(50) NOT NULL,
+    registro_id INT NOT NULL,          
     tipo_evento VARCHAR(100),
     descripcion TEXT,
     solucion TEXT,
@@ -222,6 +232,38 @@ CREATE INDEX idx_pago_trabajador ON pagos_trabajadores(trabajador_id, fecha_pago
 INSERT INTO metodos_pago (nombre) VALUES ('efectivo'), ('transferencia'), ('otro');
 
 -- FUNCIONES Y TRIGGERS PARA EVENTOS
+
+CREATE OR REPLACE FUNCTION validar_baja_pollos()
+RETURNS TRIGGER AS $$
+DECLARE
+    cantidad_disponible INT;
+BEGIN
+    SELECT 
+        p.cantidad - COALESCE(SUM(b.cantidad), 0)
+    INTO cantidad_disponible
+    FROM pollos_produccion p
+    LEFT JOIN bajas_pollos b ON p.id = b.pollo_id
+    WHERE p.id = NEW.pollo_id
+    GROUP BY p.cantidad;
+
+    IF NEW.cantidad > cantidad_disponible THEN
+        RAISE EXCEPTION 'No se pueden dar de baja % pollos. Solo hay % disponibles.', NEW.cantidad, cantidad_disponible;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_validar_bajas
+BEFORE INSERT ON bajas_pollos
+FOR EACH ROW
+EXECUTE FUNCTION validar_baja_pollos();
+
+
+
+
+
+
 
 --funcion para agregar observaciones a vento 
 
@@ -385,74 +427,71 @@ FOR EACH ROW EXECUTE FUNCTION insertar_contabilidad();
 
 
 
+-- -- Insertar trabajadores
+ INSERT INTO trabajadores (nombre, cedula, telefono, cargo, fecha_ingreso)
+ VALUES ('Carlos Pérez', '1234567890', '3001234567', 'Operario', '2024-12-01');
 
+-- -- Insertar métodos de pago ya fue hecho, pero repetimos para prueba si es necesario
+ INSERT INTO metodos_pago (nombre) VALUES ('tarjeta');
 
+-- -- Insertar inventario
+ INSERT INTO inventario (nombre_producto, descripcion, categoria, cantidad, unidad, costo_unitario, proveedor, ubicacion, responsable, metodo_pago_id, observaciones)
+ VALUES ('Maíz molido', 'Alimento para pollos', 'alimento', 100.0, 'kg', 1.50, 'AgroInsumos S.A.', 'Bodega 1', 'Carlos Pérez', 1, 'Compra inicial');
 
--- Insertar trabajadores
-INSERT INTO trabajadores (nombre, cedula, telefono, cargo, fecha_ingreso)
-VALUES ('Carlos Pérez', '1234567890', '3001234567', 'Operario', '2024-12-01');
+-- -- Insertar incubadora
+ INSERT INTO incubadoras (nombre, capacidad, ubicacion, estado)
+ VALUES ('Incubadora A1', 500, 'Zona 1', 'operativa');
 
--- Insertar métodos de pago ya fue hecho, pero repetimos para prueba si es necesario
-INSERT INTO metodos_pago (nombre) VALUES ('tarjeta');
+-- -- Insertar lote de huevos
+ INSERT INTO lotes_huevos (incubadora_id, fecha_ingreso, cantidad_huevos, observaciones)
+ VALUES (1, '2025-01-01', 300, 'Huevos fértiles');
 
--- Insertar inventario
-INSERT INTO inventario (nombre_producto, descripcion, categoria, cantidad, unidad, costo_unitario, proveedor, ubicacion, responsable, metodo_pago_id, observaciones)
-VALUES ('Maíz molido', 'Alimento para pollos', 'alimento', 100.0, 'kg', 1.50, 'AgroInsumos S.A.', 'Bodega 1', 'Carlos Pérez', 1, 'Compra inicial');
+-- -- Insertar pollitos
+ INSERT INTO pollitos (lote_id, fecha_nacimiento, cantidad_vivos, cantidad_muertos, peso_promedio, observaciones)
+ VALUES (1, '2025-01-21', 280, 20, 0.05, 'Buena eclosión');
 
--- Insertar incubadora
-INSERT INTO incubadoras (nombre, capacidad, ubicacion, estado)
-VALUES ('Incubadora A1', 500, 'Zona 1', 'operativa');
+-- -- Insertar pollos producción
+INSERT INTO pollos_produccion (pollito_id, nombre, fecha_ingreso, cantidad, peso_inicial)
+ VALUES (1, 'diego', '2025-01-22', 5, 0.05);
 
--- Insertar lote de huevos
-INSERT INTO lotes_huevos (incubadora_id, fecha_ingreso, cantidad_huevos, observaciones)
-VALUES (1, '2025-01-01', 300, 'Huevos fértiles');
+-- -- Insertar vacunas
+ INSERT INTO vacunas (pollito_id, pollo_id, fecha_aplicacion, nombre_vacuna, cantidad_dosis, observaciones)
+ VALUES (1, 1, '2025-01-23', 'Vacuna A', 1, 'Primera dosis aplicada');
 
--- Insertar pollitos
-INSERT INTO pollitos (lote_id, fecha_nacimiento, cantidad_vivos, cantidad_muertos, peso_promedio, observaciones)
-VALUES (1, '2025-01-21', 280, 20, 0.05, 'Buena eclosión');
+-- -- Alimentación pollos
+ INSERT INTO alimentacion_pollos (pollo_id, fecha, tipo_alimento, cantidad_kg, proveedor, hora_aplicacion, etapa_produccion, observaciones)
+ VALUES (1, '2025-01-25', 'Concentrado inicial', 0.1, 'NutriPollos', '07:00', 'inicio', 'Primera ración');
 
--- Insertar pollos producción
-INSERT INTO pollos_produccion (pollito_id, fecha_ingreso, peso_inicial, estado)
-VALUES (1, '2025-01-22', 0.05, 'vivo');
+-- -- Venta de pollitos
+ INSERT INTO ventas_pollitos (pollito_id, fecha_venta, cantidad_vendida, precio_unitario, cliente, metodo_pago_id, observaciones)
+ VALUES (1, '2025-01-30', 50, 2000, 'Granja Aliada', 1, 'Primera venta');
 
--- Insertar vacunas
-INSERT INTO vacunas (pollito_id, pollo_id, fecha_aplicacion, nombre_vacuna, cantidad_dosis, observaciones)
-VALUES (1, 1, '2025-01-23', 'Vacuna A', 1, 'Primera dosis aplicada');
+-- -- Venta de pollos
+ INSERT INTO ventas_pollos (pollo_id, fecha_venta, peso_kg, precio_total, cliente_nombre, cliente_contacto, metodo_pago_id, observaciones)
+ VALUES (1, '2025-02-15', 2.5, 25000, 'Mercado Central', '3111234567', 1, 'Venta completa');
 
--- Alimentación pollos
-INSERT INTO alimentacion_pollos (pollo_id, fecha, tipo_alimento, cantidad_kg, proveedor, hora_aplicacion, etapa_produccion, observaciones)
-VALUES (1, '2025-01-25', 'Concentrado inicial', 0.1, 'NutriPollos', '07:00', 'inicio', 'Primera ración');
+-- -- Pagos a trabajadores
+ INSERT INTO pagos_trabajadores (trabajador_id, fecha_pago, monto, metodo_pago_id, observaciones)
+ VALUES (1, '2025-01-31', 1500000, 1, 'Pago mensual enero');
 
--- Venta de pollitos
-INSERT INTO ventas_pollitos (pollito_id, fecha_venta, cantidad_vendida, precio_unitario, cliente, metodo_pago_id, observaciones)
-VALUES (1, '2025-01-30', 50, 2000, 'Granja Aliada', 1, 'Primera venta');
+-- -- Gastos generales
+ INSERT INTO gastos_generales (fecha, descripcion, monto, tipo, observaciones)
+ VALUES ('2025-01-05', 'Reparación incubadora', 50000, 'mantenimiento', 'Revisión de motor');
 
--- Venta de pollos
-INSERT INTO ventas_pollos (pollo_id, fecha_venta, peso_kg, precio_total, cliente_nombre, cliente_contacto, metodo_pago_id, observaciones)
-VALUES (1, '2025-02-15', 2.5, 25000, 'Mercado Central', '3111234567', 1, 'Venta completa');
+-- -- Compras esenciales (inversiones)
+ INSERT INTO inversion_compras (nombre_producto, cantidad, unidad, costo_unitario, fecha_compra, proveedor, metodo_pago_id, observaciones)
+ VALUES ('Bebederos', 20, 'unidades', 15000, '2025-01-03', 'AvícolaPro', 1, 'Compra inicial de equipos');
 
--- Pagos a trabajadores
-INSERT INTO pagos_trabajadores (trabajador_id, fecha_pago, monto, metodo_pago_id, observaciones)
-VALUES (1, '2025-01-31', 1500000, 1, 'Pago mensual enero');
+-- -- Usuarios
+ INSERT INTO usuarios (nombre_usuario, contraseña, rol, observaciones)
+ VALUES ('admin01', '123456', 'admin', 'Usuario de prueba');
 
--- Gastos generales
-INSERT INTO gastos_generales (fecha, descripcion, monto, tipo, observaciones)
-VALUES ('2025-01-05', 'Reparación incubadora', 50000, 'mantenimiento', 'Revisión de motor');
+-- -- Eventos adicionales manuales
+ INSERT INTO eventos (lote_id, fecha, tipo_evento, descripcion, solucion, observaciones)
+ VALUES (1, '2025-01-10', 'temperatura', 'Incubadora con temperatura baja', 'Ajustar termostato', 'Evento crítico');
 
--- Compras esenciales (inversiones)
-INSERT INTO inversion_compras (nombre_producto, cantidad, unidad, costo_unitario, fecha_compra, proveedor, metodo_pago_id, observaciones)
-VALUES ('Bebederos', 20, 'unidades', 15000, '2025-01-03', 'AvícolaPro', 1, 'Compra inicial de equipos');
+-- -- Verificar contenido de eventos_generales
+ SELECT * FROM eventos_generales;
 
--- Usuarios
-INSERT INTO usuarios (nombre_usuario, contraseña, rol, observaciones)
-VALUES ('admin01', '123456', 'admin', 'Usuario de prueba');
-
--- Eventos adicionales manuales
-INSERT INTO eventos (lote_id, fecha, tipo_evento, descripcion, solucion, observaciones)
-VALUES (1, '2025-01-10', 'temperatura', 'Incubadora con temperatura baja', 'Ajustar termostato', 'Evento crítico');
-
--- Verificar contenido de eventos_generales
-SELECT * FROM eventos_generales;
-
--- Verificar contabilidad
-SELECT * FROM contabilidad_general;
+ -- Verificar contabilidad
+ SELECT * FROM contabilidad_general;

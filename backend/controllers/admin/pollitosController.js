@@ -1,6 +1,6 @@
 const pool = require('../../config/db');
 
-// Obtener todos los registros de pollitos con info del lote
+//Obtener todos los registros de pollitos con info del lote
 exports.obtenerPollitos = async (req, res) => {
   try {
     const result = await pool.query(`
